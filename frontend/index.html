@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Favorite Color Tracker</title>
+  <style>
+    body { font-family: sans-serif; margin: 40px; }
+    #colorList { margin-top: 20px; border-top: 1px solid #ccc; padding-top: 10px; }
+    .color-item { padding: 5px; list-style: none; border-bottom: 1px solid #eee; }
+  </style>
+</head>
+<body>
+
+  <h1>Enter Your Favorite Color</h1>
+
+  <form id="colorForm">
+    <input type="text" id="colorInput" placeholder="Enter color" required />
+    <button type="submit">Submit</button>
+  </form>
+
+  <p id="message" style="color: green;"></p>
+
+  <h3>Colors in Database:</h3>
+  <ul id="colorList"></ul>
+
+  <script>
+    const form = document.getElementById('colorForm');
+    const input = document.getElementById('colorInput');
+    const message = document.getElementById('message');
+    const colorList = document.getElementById('colorList');
+
+    // Function to fetch all colors and update the UI
+    async function refreshColors() {
+      try {
+        const res = await fetch('http://192.168.127.129:3000/colors');
+        const data = await res.json();
+        
+        colorList.innerHTML = ''; // Clear current list
+        data.forEach(item => {
+          const li = document.createElement('li');
+          li.className = 'color-item';
+          li.textContent = `🎨 ${item.color}`;
+          colorList.appendChild(li);
+        });
+      } catch (err) {
+        console.error("Failed to fetch colors:", err);
+      }
+    }
+
+    // Handle form submission
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const colorValue = input.value;
+
+      try {
+        const res = await fetch('http://192.168.127.129:3000/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ color: colorValue })
+        });
+
+        const text = await res.text();
+        message.textContent = text;
+        input.value = '';
+        
+        // REFRESH THE LIST immediately after saving
+        refreshColors();
+      } catch (err) {
+        message.textContent = "Error connecting to server.";
+      }
+    });
+
+    // Initial load of colors when page opens
+    refreshColors();
+  </script>
+
+</body>
+</html>
