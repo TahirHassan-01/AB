@@ -1,6 +1,6 @@
 name: Project CD (Local Deployment)
 
-#on:
+on:
   push:
     branches: [ "main" ]
 
