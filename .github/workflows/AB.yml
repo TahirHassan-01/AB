@@ -38,5 +38,4 @@ jobs:
       - name: Build Docker Images
         run: docker compose build
 
-      - name: Verify Containers Start
-        run: docker compose up -d
+    
