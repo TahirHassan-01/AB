@@ -17,7 +17,7 @@ jobs:
         run: docker compose down || true
 
       - name: Build and Deploy New Version
-        run: docker compose up -d
+        run: docker compose up -d --build
 
       - name: Clean Up Unused Images
         run: docker image prune -f
