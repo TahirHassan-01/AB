@@ -1,13 +1,16 @@
-# version: "3.9"
+version: "3.9"
 
 services:
   frontend:
-    build: ./frontend
+    # Changed: Pointing to the image on Docker Hub instead of building locally
+    image: tahirhassan01/frontend-img:latest
     ports:
       - "8080:80"
+    restart: always
 
   backend:
-    build: ./backend
+    # Changed: Pointing to the image on Docker Hub instead of building locally
+    image: tahirhassan01/backend-img:latest
     ports:
       - "3000:3000"
     environment:
@@ -17,6 +20,7 @@ services:
       DB_NAME: colorsdb
     depends_on:
       - db
+    restart: always
 
   db:
     image: postgres:16
@@ -26,6 +30,7 @@ services:
       POSTGRES_DB: colorsdb
     volumes:
       - db-data:/var/lib/postgresql/data
+    restart: always
 
 volumes:
   db-data:

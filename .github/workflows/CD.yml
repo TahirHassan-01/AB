@@ -1,23 +1,34 @@
 name: Project CD (Local Deployment)
 
 on:
-  push:
-    branches: [ "main" ]
+  # This tells the CD to wait until the CI (Build & Push) is finished successfully
+  workflow_run:
+    workflows: ["Project CI"]
+    types: [completed]
 
 jobs:
   deploy:
-    # CRITICAL: This must match the label you gave your local runner
     runs-on: self-hosted
+    # Only run this if the CI actually succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v5
 
-      - name: Stop and Remove Old Containers
-        run: docker compose down || true
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
-      - name: Build and Deploy New Version
-        run: docker compose up -d
-
-      - name: Clean Up Unused Images
-        run: docker image prune -f
+      - name: Pull and Deploy New Version
+        run: |
+          # 1. Download the latest images from Docker Hub
+          docker compose pull
+          
+          # 2. Restart containers with the fresh images
+          docker compose up -d
+          
+          # 3. Clean up the old, "dangling" image layers to save disk space
+          docker image prune -f
