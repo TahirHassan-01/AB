@@ -32,7 +32,7 @@
     // Function to fetch all colors and update the UI
     async function refreshColors() {
       try {
-        const res = await fetch('http://192.168.127.129:3000/colors');
+        const res = await fetch('http://:3000/colors');
         const data = await res.json();
         
         colorList.innerHTML = ''; // Clear current list
